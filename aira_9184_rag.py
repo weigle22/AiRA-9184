@@ -9,7 +9,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 
 # 1. Load and split PDF
-pdf_path = r"D:\\LEARNING MANAGEMENT\\AiRA-9184\\AiRA-9184\\data\\Updated-2016-Revised-IRR-of-RA-No.-9184-as-of-19-July-2024.pdf"
+pdf_path = r"D:\\LEARNING MANAGEMENT\\AiRA-9184\\data\\Updated-2016-Revised-IRR-of-RA-No.-9184-as-of-19-July-2024.pdf"
 print("Loading PDF...")
 loader = PyPDFLoader(pdf_path)
 docs = loader.load()
