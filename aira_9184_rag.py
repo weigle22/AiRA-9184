@@ -6,6 +6,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 # 1. Load and split PDF
 pdf_path = r"D:\\LEARNING MANAGEMENT\\AiRA-9184\\data\\Updated-2016-Revised-IRR-of-RA-No.-9184-as-of-19-July-2024.pdf"
@@ -43,28 +44,28 @@ retriever = vectorstore.as_retriever()
 print("Retriever ready.")
 
 # 6. Use DeepSeek for answering questions (LLM only, not for embeddings)
-print("Setting up LLM and RetrievalQA chain...")
-llm = OllamaLLM(model="deepseek-r1")
+print("Setting up LLM and RetrievalQA chain with streaming...")
+llm = OllamaLLM(
+    model="deepseek-r1",
+    streaming=True,
+    callbacks=[StreamingStdOutCallbackHandler()]
+)
 qa_chain = RetrievalQA.from_chain_type(
-    llm=llm, retriever=retriever, return_source_documents=False)
+    llm=llm, retriever=retriever, return_source_documents=False
+)
 print("LLM and RetrievalQA chain ready.")
 
-# 7. Interactive Q&A loop
+# 7. Interactive Q&A loop with streaming output
 while True:
-    query = input(
-        "Ask something about AiRA-9184 (Artificial Intelligence for RA-9184) (or type 'exit'): ")
+    query = input("\nAsk something about AiRA-9184 (or type 'exit'): ")
     if query.lower() == 'exit':
         break
+
     print(f"\n🔍 You asked: {query}\n")
-    result = qa_chain.invoke(query)
-
-    # Format and print the result
-    if isinstance(result, dict) and "result" in result:
-        formatted_answer = result["result"].strip()
-    else:
-        formatted_answer = str(result).strip()
-
     print("🤖 AiRA-9184 says:\n")
     print("─────────────────────────────────────────────")
-    print(formatted_answer)
-    print("─────────────────────────────────────────────\n")
+
+    # This will stream the output token by token
+    qa_chain.invoke(query)
+
+    print("\n─────────────────────────────────────────────\n")
