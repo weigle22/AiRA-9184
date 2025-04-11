@@ -1,4 +1,3 @@
-
 # meet AiRA-9184 (Artificial Intelligence for RA-9184)
 
 import os
@@ -46,7 +45,8 @@ print("Retriever ready.")
 # 6. Use DeepSeek for answering questions (LLM only, not for embeddings)
 print("Setting up LLM and RetrievalQA chain...")
 llm = OllamaLLM(model="deepseek-r1")
-qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm, retriever=retriever, return_source_documents=False)
 print("LLM and RetrievalQA chain ready.")
 
 # 7. Interactive Q&A loop
@@ -55,6 +55,16 @@ while True:
         "Ask something about AiRA-9184 (Artificial Intelligence for RA-9184) (or type 'exit'): ")
     if query.lower() == 'exit':
         break
-    print(f"Processing query: {query}")
-    answer = qa_chain.invoke(query)
-    print("Answer:", answer)
+    print(f"\n🔍 You asked: {query}\n")
+    result = qa_chain.invoke(query)
+
+    # Format and print the result
+    if isinstance(result, dict) and "result" in result:
+        formatted_answer = result["result"].strip()
+    else:
+        formatted_answer = str(result).strip()
+
+    print("🤖 AiRA-9184 says:\n")
+    print("─────────────────────────────────────────────")
+    print(formatted_answer)
+    print("─────────────────────────────────────────────\n")
